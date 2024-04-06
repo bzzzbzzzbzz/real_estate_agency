@@ -4,8 +4,6 @@ from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
 
 class Flat(models.Model):
-    owner = models.CharField('ФИО владельца', max_length=200)
-    owners_phonenumber = models.CharField('Номер владельца', max_length=20)
     created_at = models.DateTimeField(
         'Когда создано объявление',
         default=timezone.now,
@@ -49,8 +47,7 @@ class Flat(models.Model):
         db_index=True)
 
     new_building = models.BooleanField('Тип здания', null=True)
-    liked_by = models.ManyToManyField(User, blank=True)
-    owner_pure_phone = PhoneNumberField('Нормал. номер владельца', blank=True)
+    liked_by = models.ManyToManyField(User, blank=True, related_name='liked_flats', verbose_name='Понравилось')
 
     def __str__(self):
         return f'{self.town}, {self.address} ({self.price}р.)'
@@ -58,18 +55,18 @@ class Flat(models.Model):
 
 
 class Complaint(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, verbose_name='Квартира')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь', related_name='complaints')
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, verbose_name='Квартира', related_name='complaints')
     complaint_text = models.TextField(verbose_name='Текст жалобы')
 
     def __str__(self):
         return f'Жалоба от {self.user.username} на квартиру {self.flat.address}'
 
 class Owner(models.Model):
-    owner_name = models.CharField('ФИО владельца', max_length=200)
-    owner_number = models.CharField('Номер владельца', max_length=20)
-    owner_pure_number = PhoneNumberField('Нормал. номер владельца', blank=True)
-    owner_flat = models.ManyToManyField(Flat, blank=True, verbose_name='Квартира', related_name='onwers')
+    name = models.CharField('ФИО владельца', max_length=200)
+    number = models.CharField('Номер владельца', max_length=20)
+    pure_number = PhoneNumberField('Нормал. номер владельца', blank=True)
+    flat = models.ManyToManyField(Flat, blank=True, verbose_name='Квартира', related_name='onwers')
 
     def __str__(self):
-        return self.owner_name
+        return self.name

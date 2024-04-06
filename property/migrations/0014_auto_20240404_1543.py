@@ -6,10 +6,10 @@ def move_data_to_owner(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
     Owner = apps.get_model('property', 'Owner')
     for flat in Flat.objects.all():
-        owner, created = Owner.objects.get_or_create(
+        owner, created = Owner.objects.update_or_create(
             owner_name=flat.owner,
             owner_number=flat.owners_phonenumber,
-            owner_pure_number=flat.owner_pure_phone
+            owner_pure_number=flat.owner_pure_phone,
         )
 
         if created:

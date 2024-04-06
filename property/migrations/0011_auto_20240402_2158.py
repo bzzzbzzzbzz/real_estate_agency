@@ -5,15 +5,19 @@ import phonenumbers
 
 def change_number_look(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
-    for flat in Flat.objects.all():
+    flats = Flat.objects.all()
+    for flat in flats:
         number = flat.owners_phonenumber
         normal_number = phonenumbers.parse(number, 'RU')
         try:
-            phonenumbers.is_valid_number(normal_number)
-            flat.owner_pure_phone = normal_number
+            if phonenumbers.is_valid_number(normal_number):
+                flat.owner_pure_phone = normal_number
+            else:
+                flat.owner_pure_phone = None
         except AttributeError:
             flat.owner_pure_phone = None
-        flat.save()
+    Flat.objects.bulk_update(flats, ['owner_pure_phone'])
+
 
 class Migration(migrations.Migration):
 
