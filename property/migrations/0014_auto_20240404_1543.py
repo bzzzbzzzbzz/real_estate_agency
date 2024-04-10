@@ -5,7 +5,8 @@ from django.db import migrations
 def move_data_to_owner(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
     Owner = apps.get_model('property', 'Owner')
-    for flat in Flat.objects.all():
+    flats = Flat.objects.all()
+    for flat in flats.iterator():
         owner, created = Owner.objects.update_or_create(
             owner_name=flat.owner,
             owner_number=flat.owners_phonenumber,
