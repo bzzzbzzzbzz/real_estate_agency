@@ -6,7 +6,7 @@ import phonenumbers
 def change_number_look(apps, schema_editor):
     Flat = apps.get_model('property', 'Flat')
     flats = Flat.objects.all()
-    for flat in flats:
+    for flat in flats.iterator():
         number = flat.owners_phonenumber
         normal_number = phonenumbers.parse(number, 'RU')
         try:
